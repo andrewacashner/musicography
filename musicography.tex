@@ -1,0 +1,130 @@
+\documentclass{article}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{semantic-markup}
+\usepackage{musicography}
+\usepackage{fancyvrb}
+\frenchspacing
+
+\newenvironment{codetable}
+{\begin{quote}\begin{tabular}{lll}}
+{\end{tabular}\end{quote}}
+
+\usepackage[
+    pdftitle={The musicography Package: Symbols for Music Writing with
+    pdflatex},
+    pdfauthor={Andrew A. Cashner},
+    pdfsubject={LaTeX package},
+    pdfkeywords={LaTeX, symbols, music, musicology, humanities}
+]{hyperref}
+
+\title{The \code{musicography} Package: Symbols for Music Writing with
+\code{pdflatex}}
+\author{Andrew A. Cashner\thanks{%
+    \href{mailto:andrewacashner@gmail.com}
+    {\nolinkurl{andrewacashner@gmail.com}}%
+    }%
+}
+
+\begin{document}
+\maketitle
+
+Font packages for \code{pdflatex} only provided a limited range of musical
+symbols. 
+The \code{lilyglyphs} package uses Lilypond's fonts, but requires
+\code{lualatex}. 
+This package makes available the most commonly used symbols in writing about
+music in a way that can be used with \code{pdflatex} and looks consistent and
+attractive.
+It includes accidentals, meters, and notes of different rhythmic values.
+
+This package builds on the approach used in the \code{harmony} package, where
+the symbols are taken from the MusiXTeX fonts.
+But it provides a larger range of symbols and a more flexible, user-friendly
+interface written using \code{xparse}.
+
+\tableofcontents
+
+\section{Package Options}
+
+To use the package, write \verb|\usepackage{musicography}| in your preamble.
+If you are also using this author's \code{semantic-markup} package, load
+\code{semantic-markup} first, since \code{musicography} modifies the commands
+for accidentals in the other package.
+
+The \code{bigger} option provides larger font sizes that match better with
+certain fonts.
+
+The \verb|\musNumFont| command allows you to change the font of the numerals
+used.
+For example, if using the \code{ebgaramond} font package, it looks better if you
+do this: 
+\begin{quote}
+    \verb|\renewcommand{\musNumFont}[1]{\liningnums{#1}}|.
+\end{quote}
+
+\section{Symbols and Commands}
+
+\subsection{Accidentals}
+
+\begin{codetable}
+    Flat & \verb|\musFlat| or \verb|\fl| & \musFlat\\
+    Sharp & \verb|\musSharp| or \verb|\sh| & \musSharp\\
+    Natural & \verb|\musNatural| or \verb|\na| & \musNatural\\
+    Double Flat & \verb|\musDoubleFlat| & \musDoubleFlat\\
+    Double Sharp & \verb|\musDoubleSharp| & \musDoubleSharp\\
+\end{codetable}
+
+\subsection{Notes of Different Rhythmic Values}
+
+Commands are available using modern (United States) note names; in several cases
+there are also aliases for older note names.
+
+\begin{codetable}
+    Whole note (semibreve) & \verb|\musWhole| or \verb|\musSemibreve| &
+    \musWhole\\
+    Half note (minim) & \verb|\musHalf| or \verb|\musMinim| & \musHalf\\
+    Quarter note (semiminim) & \verb|\musQuarter| or \verb|\musSeminimin| &
+    \musQuarter\\
+    Eighth note (corchea) & \verb|\musEighth| or \verb|\musCorchea| &
+    \musEighth\\
+    Sixteenth note & \verb|\musSixteenth| & \musSixteenth\\
+\end{codetable}
+
+A dot may be added to any of the above by adding \code{Dotted} to the end of the
+command. For example:
+
+\begin{codetable}
+    Dotted whole note & \verb|\musWholeDotted| & \musWholeDotted\\
+    Dotted quarter note & \verb|\musQuarterDotted| & \musQuarterDotted\\
+\end{codetable}
+
+\subsection{Meter Signatures}
+
+\begin{codetable}
+    Common duple & \verb|\meterC| & \meterC\\
+    \term{Alla breve} & \verb|\meterCutC| & \meterCutC\\
+    Ternary (16th--18th cent.) & \verb|\meterCThree| & \meterCThree\\
+    Ternary with $3:2$ proportion & \verb|\meterCThreeTwo| &
+    \meterCThreeTwo\\
+    Spanish 17th-cent. ternary & \verb|\meterCZ| & \meterCZ\\
+\end{codetable}
+
+\subsection{Customization}
+
+It would be a simple matter of using \verb|\newcommand| or \verb|\let| to create
+aliases for these commands, say, for British usage (such as \verb|\quaver|).
+
+\LaTeX{} programmers may wish to use the package's internal commands directly 
+(such as \verb|\musSymbol| and \verb|\musAccidental|) to
+access more symbols from the fonts or to fine-tune their appearance (see the
+code listing below).
+
+\section{Code}
+
+\VerbatimInput{musicography.sty}
+
+\end{document}
