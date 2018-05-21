@@ -1,6 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{musicography}
-[2017/10/31 Symbols for music writing with pdflatex]
+\ProvidesClass{musicography}[2018/05/21
+  Symbols for music writing with pdflatex]
 
 % Copyright 2017 Andrew A. Cashner, andrewacashner@gmail.com
 
@@ -19,6 +19,7 @@
 % and the documentation file musicography.tex.
 
 % CHANGE LOG
+% 2018-05-21 Override semantic-markup's \fl, \sh, \na commands if it is loaded
 % 2017-10-31 Corrected glyph for \musHalf and documented
 %              \musMeter and \musFigures
 % 2017-08-29 First version on CTAN
@@ -70,12 +71,16 @@
 
 % Shorthand accidental commands
 % These commands are defined differently in the semantic-markup package,
-% so LaTeX will use musicography commands instead, if this package is called
-% after
-\let\fl\musFlat
-\let\sh\musSharp
-\let\na\musNatural
-
+% so LaTeX will use musicography commands instead
+\@ifpackageloaded{semantic-markup}{%
+    \RenewDocumentCommand{\fl}{}{\musFlat}
+    \RenewDocumentCommand{\sh}{}{\musSharp}
+    \RenewDocumentCommand{\na}{}{\musNatural}
+}{%
+    \NewDocumentCommand{\fl}{}{\musFlat}
+    \NewDocumentCommand{\sh}{}{\musSharp}
+    \NewDocumentCommand{\na}{}{\musNatural}
+}
 % Print a composite music symbol of a notehead plus stem
 %  #1 Symbol musSymbol command for notehead
 \NewDocumentCommand{\musStemmedNote}{ m }{%
