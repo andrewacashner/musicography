@@ -27,6 +27,7 @@
     {\nolinkurl{andrewacashner@gmail.com}}%
     }%
 }
+\date{May 21, 2018}
 
 \begin{document}
 \maketitle
@@ -126,17 +127,20 @@ aliases for these commands, say, for British usage (such as \verb|\quaver|).
 access more symbols from the fonts or fine-tune their appearance.
 See \verb|\musSymbol| and \verb|\musAccidental| in the code listing below. 
 
-\section{Code}
-
-\VerbatimInput{musicography.sty}
-
 \section{Changes}
 
 \begin{tabular}{r p{0.75\textwidth}}
+    2018/05/21 & Override semantic-markup's \verb|\fl|, \verb|\sh|, \verb|\na|
+    commands if it is loaded \\
     2017/10/31 & Corrected glyph used for \verb|\musHalf| and documented
     \verb|\musMeter| and \verb|\musFigures|\\
     2017/08/29 & First version on CTAN\\
     2017/04/12 & Created\\
 \end{tabular}
+
+\section{Code}
+
+\VerbatimInput{musicography.sty}
+
 
 \end{document}
