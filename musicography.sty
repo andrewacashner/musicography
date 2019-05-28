@@ -1,8 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{musicography}[2018/05/21
+\ProvidesClass{musicography}[2019/05/28
   Symbols for music writing with pdflatex]
 
-% Copyright 2017 Andrew A. Cashner, andrewacashner@gmail.com
+% Copyright 2019 Andrew A. Cashner, andrewacashner@gmail.com
 
 % This work may be distributed and/or modified under the 
 % conditions of the LaTeX Project Public License, either
@@ -19,6 +19,17 @@
 % and the documentation file musicography.tex.
 
 % CHANGE LOG
+% 2019-05-28 - Fix issue #1:
+%               + Correct notehead symbol for values < quarter note
+%                 (was hollow, should be filled)
+%               + Add 32nd and 64th notes regular and dotted
+%               + \musSymbol now inside an \mbox to fix alignment problems
+%            - New features (some requested in issue #1)
+%               + Add medieval perfect meter
+%               + Add aliases for fusa (= corchea = eighth note)
+%               + Replace musStack implementation with stackengine:
+%                 Now takes any number of space-separated arguments to stack
+%                 numerals, allowing for full figured-bass notation
 % 2018-05-21 Override semantic-markup's \fl, \sh, \na commands if it is loaded
 % 2017-10-31 Corrected glyph for \musHalf and documented
 %              \musMeter and \musFigures
@@ -55,7 +66,7 @@
 %  #4 kern after     
 %  #5 symbol code (e.g., \symbol{4}) 
 \NewDocumentCommand{\musSymbol}{ O{\musFont} m m m m }{%
-    {#1\kern#2\raisebox{#3}{#5}\kern#4}%
+    \mbox{#1\kern#2\raisebox{#3}{#5}\kern#4}%
 }
 
 % Accidentals
@@ -119,10 +130,16 @@
     \musStemmedNote{\symbol{7}}%
 }
 \NewDocumentCommand{\musEighth}{}{%
-    \musFlaggedNote{\symbol{8}}{\symbol{40}}%
+    \musFlaggedNote{\symbol{7}}{\symbol{40}}%
 }
 \NewDocumentCommand{\musSixteenth}{}{%
-    \musFlaggedNote{\symbol{8}}{\symbol{41}}%
+    \musFlaggedNote{\symbol{7}}{\symbol{41}}%
+}
+\NewDocumentCommand{\musThirtySecond}{}{%
+    \musFlaggedNote{\symbol{7}}{\symbol{42}}%
+}
+\NewDocumentCommand{\musSixtyFourth}{}{%
+    \musFlaggedNote{\symbol{7}}{\symbol{43}}%
 }
 
 \NewDocumentCommand{\musWholeDotted}{}{%
@@ -140,43 +157,19 @@
 \NewDocumentCommand{\musSixteenthDotted}{}{%
     \musDottedNote{\musSixteenth}%
 }
+\NewDocumentCommand{\musThirtySecondDotted}{}{%
+    \musDottedNote{\musThirtySecond}%
+}
+\NewDocumentCommand{\musSixtyFourthDotted}{}{%
+    \musDottedNote{\musSixtyFourth}%
+}
 
-% Command to stack numerals
-% Adapted from harmony.sty's \ueber command 
-\newdimen\tmpdima
-\newdimen\tmpdimb
-\newdimen\tmpdimc
-\newdimen\tmpdimd
-\newdimen\tmpdime
-\newbox\nbxa
-\newbox\nbxb
-\newbox\nbxc
-\newbox\nbxd
-\newbox\nbxe
-\newbox\nbxf
-\newbox\nbxg
-\newbox\nbxh
-\newbox\nbxi
 
-\NewDocumentCommand{\musStack}{ m m }{%
-    \setbox\nbxi=\hbox{%
-        \setbox\nbxa=\hbox{\scriptsize{\musNumFont{#1}}}%
-        \setbox\nbxb=\hbox{\scriptsize{\musNumFont{#2}}}%
-        \ifdim\wd\nbxa>\wd\nbxb%
-        \tmpdima=\wd\nbxa%
-        \else%
-        \tmpdima=\wd\nbxb%
-        \fi%
-        \setbox\nbxa=\hbox to \tmpdima{%
-            \scriptsize\hss{\musNumFont{#1}}\hss}%
-        \setbox\nbxb=\hbox to \tmpdima{\scriptsize\hss{%
-            \musNumFont{#2}}\hss}%
-        \lower0.3ex\copy\nbxb%
-        \kern-\wd\nbxb%
-        \raise0.8\ht\nbxb%
-        \box\nbxa%
-    }%
-    \unhbox\nbxi%
+% Command to stack numerals for metrical symbols or figured bass
+% Takes any number of space-separated arguments and stacks them vertically
+\RequirePackage{stackengine}
+\NewDocumentCommand{\musStack}{ O{\musNumFont} m }{%
+    {#1\Shortstack[l]{#2}}%
 }
 
 % Meter symbols
@@ -193,10 +186,19 @@
 %  #1 number on top
 %  #2 number on bottom
 \NewDocumentCommand{\musMeter}{ m m }{%
-    \musStack{#1}{#2}\kern0.05em
+    \musStack{#1 #2}\kern0.05em
 }
 % Same command used for figured bass
-\NewDocumentCommand{\musFigures}{}{\musMeter}
+\NewDocumentCommand{\musFigFont}{}{%
+    \scriptsize
+    \let\musFontLarge\musFontBig
+}
+\NewDocumentCommand{\musFig}{ m }{%
+    \musStack[\musFigFont]{#1}%
+}
+\NewDocumentCommand{\noFig}{ O{5} }{%
+    \hphantom{#1}%
+}
 
 \NewDocumentCommand{\meterC}{}{%
     \musSymbolMeter{\symbol{83}}%
@@ -226,9 +228,11 @@
 \NewDocumentCommand{\musMinim}             {}{\musHalf}
 \NewDocumentCommand{\musSemiminim}         {}{\musQuarter}
 \NewDocumentCommand{\musCorchea}           {}{\musEighth}
+\NewDocumentCommand{\musFusa}              {}{\musEighth}
 \NewDocumentCommand{\musSemibreveDotted}   {}{\musWholeDotted}
 \NewDocumentCommand{\musMinimDotted}       {}{\musHalfDotted}
 \NewDocumentCommand{\musSeminiminimDotted} {}{\musQuarterDotted}
 \NewDocumentCommand{\musCorcheaDotted}     {}{\musEighthDotted}
+\NewDocumentCommand{\musFusaDotted}        {}{\musEighthDotted}
 
 \endinput
