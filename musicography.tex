@@ -14,8 +14,7 @@
 {\end{tabular}\end{quote}}
 
 \usepackage[
-    pdftitle={The musicography Package: Symbols for Music Writing with
-    pdflatex},
+    pdftitle={The musicography Package: Symbols for Music Writing},
     pdfauthor={Andrew A. Cashner},
     pdfsubject={LaTeX package}, pdfkeywords={LaTeX, symbols, music, musicology, humanities}
 ]{hyperref}
@@ -27,18 +26,19 @@
     {\nolinkurl{andrewacashner@gmail.com}}%
     }%
 }
-\date{November 24, 2019}
+\date{January 29, 2020}
 
 \begin{document}
 \maketitle
 
-Font packages for \code{pdflatex} only provided a limited range of musical
-symbols. 
+Most \LaTeX{} font packages and freely available fonts only provided a limited
+range of musical symbols. 
 The \code{lilyglyphs} package uses Lilypond's fonts, but requires
 \code{lualatex}. 
 This package makes available the most commonly used symbols in writing about
-music in a way that can be used with \code{pdflatex} and looks consistent and
-attractive.
+music in a way that looks consistent and attractive.
+It is especially useful for \code{pdflatex} but also works alongside Unicode
+fonts with \code{xelatex}.
 It includes accidentals, meters, notes of different rhythmic values, and
 automatic formatting of figured bass.
 
@@ -46,6 +46,9 @@ This package builds on the approach used in the \code{harmony} package, where
 the symbols are taken from the MusiXTeX fonts.
 But it provides a larger range of symbols and a more flexible, user-friendly
 interface written using \code{xparse}.
+The package is meant to work hand-in-hand with my \code{semantic-markup}
+package, and overrides some of its music-symbol commands with better
+alternatives.
 
 \tableofcontents
 
@@ -193,6 +196,7 @@ See \verb|\musSymbol| and \verb|\musAccidental| in the code listing below.
 \section{Changes}
 
 \begin{itemize}
+    \item[2020-01-29] Reduced stack gap for \verb|\musFig|
     \item[2019/11/24] Fix \verb|\MeterCThreeTwo| so that numbers are stacked
         and aligned correctly
     \item[2019/05/28] Bux fixes and new features, especially figured bass

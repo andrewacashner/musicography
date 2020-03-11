@@ -1,8 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{musicography}[2019/11/24
+\ProvidesPackage{musicography}[2020/01/29
   Symbols for music writing with pdflatex]
 
-% Copyright 2019 Andrew A. Cashner, andrewacashner@gmail.com
+% Copyright 2020 Andrew A. Cashner, andrewacashner@gmail.com
 
 % This work may be distributed and/or modified under the 
 % conditions of the LaTeX Project Public License, either
@@ -19,6 +19,7 @@
 % and the documentation file musicography.tex.
 
 % CHANGE LOG
+% 2020-01-29 - Reduced stack gap for \musFig
 % 2019-11-24 - Fix problem with \MeterCThreeTwo where numerals were being
 %               printed next to each other instead of stacked.
 % 2019-05-28 - Fix issue #1:
@@ -196,6 +197,7 @@
     \let\musFontLarge\musFontBig
 }
 \NewDocumentCommand{\musFig}{ m }{%
+    \setstackgap{S}{1pt}%
     \musStack[\musFigFont]{#1}%
 }
 \NewDocumentCommand{\noFig}{ O{5} }{%

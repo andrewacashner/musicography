@@ -2,7 +2,7 @@
 
 This package makes available the most commonly used symbols in writing about
 music in a way that can be used with `pdflatex` and looks consistent and
-attractive.
+attractive. (It also works with `xelatex`.)
 It includes accidentals, meters, and notes of different rhythmic values.
 The package provides a flexible, user-friendly interface written using `xparse`.
 
