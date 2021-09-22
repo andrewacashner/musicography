@@ -182,8 +182,15 @@
         {\kern-1pt\musFontBig\raisebox{0.3ex}{#1}\kern0.3em}%
     }%
 }
+
+% Meter plus numerals
+\NewDocumentCommand{\meterPlus}{ m m }{#1\kern-0.7pt#2}
+
 % Meter that combines \meterC with numerals (e.g., C3 C3/2)
-\NewDocumentCommand{\meterCplus}{ m }{\meterC{}\kern-0.7pt#1}
+\NewDocumentCommand{\meterCplus}{ m }{\meterPlus{\meterC}{#1}}
+
+% Meter that combines \meterCutC with numerals (e.g., C3 C3/2)
+\NewDocumentCommand{\meterCutCplus}{ m }{\meterPlus{\meterCutC}{#1}}
 
 % Numeric meter signatures (e.g., 3/4)
 %  #1 number on top
@@ -211,12 +218,26 @@
     \musSymbolMeter{\symbol{82}}%
 }
 % Ternary meters used in 16th--18th c. music
+\NewDocumentCommand{\meterThree}{}{%
+    {\musNumFont{3}}%
+}
+\NewDocumentCommand{\meterThreeTwo}{}{%
+    {{\footnotesize\stackanchor[1pt]{3}{2}}}%
+}
+
 \NewDocumentCommand{\meterCThree}{}{%
-    \meterCplus{\musNumFont{3}}%
+    \meterCplus{\meterThree}%
 }
 \NewDocumentCommand{\meterCThreeTwo}{}{%
-    \meterCplus{{\footnotesize\stackanchor[1pt]{3}{2}}}%
+    \meterCplus{\meterThreeTwo}%
 }
+\NewDocumentCommand{\meterCutCThree}{}{%
+    \meterCutCplus{\meterThree}%
+}
+\NewDocumentCommand{\meterCutCThreeTwo}{}{%
+    \meterCutCplus{\meterThreeTwo}%
+}
+
 % Ternary meter used in 17th-century Spanish music
 \NewDocumentCommand{\meterCZ}{}{%
     \meterCplus{Z}%
