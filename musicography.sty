@@ -123,6 +123,9 @@
     \musSymbol{-0.2em}{-0.5ex}{0.7em}{\symbol{24}}%
 }
 
+\NewDocumentCommand{\musBreve}{}{%
+    \musSymbol{0.05em}{0.5ex}{1.35em}{\symbol{32}}%
+}
 \NewDocumentCommand{\musWhole}{}{%
     \musSymbol{0.05em}{0.5ex}{1.35em}{\symbol{9}}%
 }
@@ -211,13 +214,17 @@
     \hphantom{#1}%
 }
 
+% Meter signatures with a C or cut C symbol
+% Just the symbols
 \NewDocumentCommand{\meterC}{}{%
     \musSymbolMeter{\symbol{83}}%
 }
 \NewDocumentCommand{\meterCutC}{}{%
     \musSymbolMeter{\symbol{82}}%
 }
+
 % Ternary meters used in 16th--18th c. music
+% Just the numbers
 \NewDocumentCommand{\meterThree}{}{%
     {\musNumFont{3}}%
 }
@@ -225,12 +232,7 @@
     {{\footnotesize\stackanchor[1pt]{3}{2}}}%
 }
 
-\NewDocumentCommand{\meterCThree}{}{%
-    \meterCplus{\meterThree}%
-}
-\NewDocumentCommand{\meterCThreeTwo}{}{%
-    \meterCplus{\meterThreeTwo}%
-}
+% Proportions of cut C
 \NewDocumentCommand{\meterCutCThree}{}{%
     \meterCutCplus{\meterThree}%
 }
@@ -238,10 +240,19 @@
     \meterCutCplus{\meterThreeTwo}%
 }
 
+% Proportions of C
+\NewDocumentCommand{\meterCThree}{}{%
+    \meterCplus{\meterThree}%
+}
+\NewDocumentCommand{\meterCThreeTwo}{}{%
+    \meterCplus{\meterThreeTwo}%
+}
+
 % Ternary meter used in 17th-century Spanish music
 \NewDocumentCommand{\meterCZ}{}{%
     \meterCplus{Z}%
 }
+
 % Perfect meter in medieval music
 \NewDocumentCommand{\meterO}{}{%
     $\bigcirc$
@@ -260,4 +271,6 @@
 \NewDocumentCommand{\musCorcheaDotted}     {}{\musEighthDotted}
 \NewDocumentCommand{\musFusaDotted}        {}{\musEighthDotted}
 
+% Scale degrees
+\NewDocumentCommand{\scaleDegree}{ m }{$\hat{#1}$}
 \endinput
