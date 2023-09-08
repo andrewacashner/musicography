@@ -1,17 +1,23 @@
 \documentclass{article}
 
-\usepackage{lmodern}
 \usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 \usepackage{geometry}
 \usepackage{semantic-markup}
-\usepackage{musicography}
+\usepackage[bigger]{musicography}
 \usepackage{fancyvrb}
 \frenchspacing
+\setcounter{secnumdepth}{1}
 
-\newenvironment{codetable}
-{\begin{quote}\begin{tabular}{lll}}
-{\end{tabular}\end{quote}}
+\NewDocumentEnvironment{codetable}{}
+{
+    \begin{quote}
+        \begin{tabular}{p{0.3\textwidth} p{0.4\textwidth} l}
+}
+{
+        \end{tabular}
+    \end{quote}
+}
 
 \usepackage[
     pdftitle={The musicography Package: Symbols for Music Writing},
@@ -26,7 +32,7 @@
     {\nolinkurl{andrewacashner@gmail.com}}%
     }%
 }
-\date{January 29, 2020}
+\date{September 8, 2023}
 
 \begin{document}
 \maketitle
@@ -45,7 +51,8 @@ automatic formatting of figured bass.
 This package builds on the approach used in the \code{harmony} package, where
 the symbols are taken from the MusiXTeX fonts.
 But it provides a larger range of symbols and a more flexible, user-friendly
-interface written using \code{xparse}.
+interface written using the new interface introduced in  \code{xparse} (now
+built in to \LaTeX).
 The package is meant to work hand-in-hand with my \code{semantic-markup}
 package, and overrides some of its music-symbol commands with better
 alternatives.
@@ -60,18 +67,41 @@ If you are also using this author's \code{semantic-markup} package,
 the other package.
 
 The \code{bigger} option provides larger font sizes that match better with
-certain fonts.
+certain fonts (tested with 12-point \code{ebgaramond}).
 
-The package now (2019) provides full support for figured-bass notation using the
-\verb|\musFig| command.
+\section{Fonts}
 
-The \verb|\musNumFont| command allows you to change the font of the numerals
-used.
-For example, if using the \code{ebgaramond} font package, it looks better if you
-do this: 
-\begin{quote}
-    \verb|\renewcommand{\musNumFont}[1]{\liningnums{#1}}|.
-\end{quote}
+The package requires the MusiX\TeX{} fonts, which are installed by default in
+\TeX{}Live.
+In case there is anyone else using the obscure \verb|\meterCZ| command (in
+which case, send me a note!) it now requires the EB Garamond font, also
+installed in \TeX{}Live.
+
+Most of the font commands can be customized by redefining one of the following
+commands:
+\begin{itemize}
+    \item \verb|\musAccidentalFont|: The size of accidentals is defined as
+        larger relative to the other symbols.
+
+    \item \verb|\musNumFont|: This command is used in typesetting time
+        signatures and meters. By default such numbers are boldfaced, which
+        looks better in most fonts. Redefine this command to adjust the
+        appearance of the numbers, for example by using lining numerals.
+        Recommended with \code{ebgaramond} or \code{libertine}:
+        \begin{quote}
+            \verb|\RenewDocumentCommand{\musNumFont}{\liningnums}|
+        \end{quote}
+        The command is employed in a way that both font switches and commands
+        with arguments will work (e.g., \verb|\bfseries\liningnums|), but take
+        care when combining multiple elements.
+
+    \item \verb|\musFigSize| and \verb|\musFigFont|: These commands are used
+        in typesetting figured bass. By default \verb|\musFigSize| sets a
+        smaller size for both numerals and accidentals. The command
+        \verb|\musFigFont| is empty by default but it would be a good idea to
+        make sure the treatment of numerals matches \verb|\musNumFont| if, for
+        example, you are using lining numerals.
+\end{itemize}
 
 
 \section{Symbols and Commands}
@@ -88,8 +118,8 @@ do this:
 
 \subsection{Notes of Different Rhythmic Values}
 
-Commands are available using modern (United States) note names; in several cases
-there are also aliases for older note names.
+Commands are available using modern (United States) note names; in several
+cases there are also aliases for older note names.
 
 \begin{codetable}
     Whole note (semibreve) & \verb|\musWhole| or \verb|\musSemibreve| &
@@ -114,6 +144,12 @@ command. For example:
     \musThirtySecondDotted\\
 \end{codetable}
 
+\subsection{Other Symbols}
+
+\begin{codetable}
+    \emph{Segno} repeat marker & \verb|\musSegno| & \musSegno \\
+\end{codetable}
+
 \subsection{Meter Signatures}
 
 \begin{codetable}
@@ -129,73 +165,119 @@ command. For example:
 For other time signatures, use \verb|\musMeter{}{}|; the two arguments are the
 numerator and denominator of the fraction, respectively.
 
+By default this command applies the \verb|\musNumFont| command to its
+arguments; in a pinch (such as for testing) you can supply an alternate font
+command as an optional first argument, which will be used instead of
+\verb|\musNumFont|.
+In practical use it would be better and more consistent to redefine
+\verb|\musNumFont| as described above.
+
+
 \subsection{Figured Bass}
 
 For figured-bass notation, use \verb|\musFig{}|.
-The command, as of May 2019 now re-implemented using the \code{stackengine}
-package, takes a single argument which may contain as many space-separated
-elements as you like. 
-(The \verb|\musFig| command is implemented with \verb|\musStack{}|, which is
-also used to for \verb|\musMeter|.)
+The command takes a single argument which may contain as many space-separated
+elements as you like (just like \verb|\Shortstack| from the \code{stackengine}
+package, which it uses internally).
 
-The elements in the argument will be stacked vertically and left-aligned.
+The elements in the argument will be stacked vertically and right-aligned (to
+allow for accidentals preceding the numerals).
 Multiple figures in a row should be enclosed in brackets if there are spaces
 between them.
 
 To align figures when there are empty slots, as in \musFig{6--5
 \noFig[5--]\musSharp}, use \verb|\noFig[]|. 
-It will insert horizontal space the
-same width as its optional argument when typeset; the default value is the
-width of the numeral 5.
+It will insert horizontal space the same width as its optional argument when
+typeset; the default value is the width of the numeral 5.
 It does this using \verb|\hphantom|, so you should supply the same text in the
 argument as the figure with which you want to align. 
 The code for the example at the beginning of this paragraph was 
 \verb|\musFig{6--5 \noFig[5--]\musSharp}|.
 
-The font may be controlled by redefining \verb|\musFigFont{}|.
-Its default value is as follows:
-\begin{Verbatim}
-\NewDocumentCommand{\musFigFont}{}{%
-    \scriptsize
-    \let\musFontLarge\musFontBig
-}
-\end{Verbatim}
-This reduces the size of numbers and the music font so that they fit better with
-surrounding text and so that numerals and accidentals in the figures match.
-
-
+You can adjust the size and font of the figures by redefining
+\verb|\musFigSize| and \verb|\musFigFont| as described above.
+The command applies both commands, in that order, so if you change them, make
+sure the two work together appropriately.
 
 {\renewcommand{\arraystretch}{2.5}
 \small
 \begin{codetable}
-    Two figures & \verb|\musFig{7 5\musSharp}| 
-    & \musFig{7 5\musSharp}\\
-    Three figures & \verb|\musFig{7\musFlat{} 5 3}| 
-    & \musFig{7\musFlat{} 5 3}\\
+    Two figures & \verb|\musFig{7 \sh5}| 
+    & \musFig{7 \sh5}\\
+    Two figures, accidentals after & \verb|\musFig[l]{7 \sh5}| 
+    & \musFig[l]{7 5\sh}\\
+    Three figures & \verb|\musFig{\fl7} 5 3}| 
+    & \musFig{\fl7 5 3}\\
     Four figures & \verb|\musFig{7 5 4 2}| &
-    \musFig{9 7 5 3}\\
+    \musFig{7 5 4 2}\\
     Voice leading & \verb|\musFig{7--6 5--4 3}| 
     & \musFig{7--6 5--4 3}\\
-    Voice leading & \verb|\musFig{6--7 4--5 \noFig[2--]3}| 
-    & \musFig{7--6 5--4 \noFig[2--]3}\\
     Multiple figures per row 
-    & \verb|\musFig{{6\musFlat{} 5} {\noFig[6\musFlat] \musSharp}}|
-    & \musFig{{6\musFlat{} 5} {\noFig[6\musFlat] \musSharp}}\\
+    & \verb|\musFig{{\fl6} 5} {\noFig[\fl6] \sh}}|
+    & \musFig{{\fl6 5} {\noFig[\fl6] \sh}}\\
 \end{codetable}}
 
+\subsection{Scale Degrees and Octave Numbers}
 
-\subsection{Customization}
+\begin{codetable}
+    Scale degree & \verb|A is \musDegree{6} in C major.|
+    & A is \musDegree{6} in C major. \\
+    Pitch with octave & \verb|\musPitch{A}{4} is 440Hz.|
+    & \musPitch{A}{4} is 440Hz. \\
+\end{codetable}
 
-It would be a simple matter of using \verb|\newcommand| or \verb|\let| to create
-aliases for these commands, say, for British usage (such as \verb|\quaver|).
+For more flexible options, including traditional, non-Helmholtz notation for
+pitches, use my \code{octave} package.
 
-\LaTeX{} programmers may wish to use the package's internal commands directly to
-access more symbols from the fonts or fine-tune their appearance.
-See \verb|\musSymbol| and \verb|\musAccidental| in the code listing below. 
+\section{Customization}
+
+To create aliases for these commands, such as \verb|\quaver| for British
+usage, use \verb|\NewDocumentCommand| like this:
+\begin{quote}
+    \verb|\NewDocumentCommand{\quaver}{}{\musEighth}|
+\end{quote}
+If this new LaTeX interface is unfamiliar, \verb|\newcommand| or even
+\verb|\let| will still work.
+
+\LaTeX{} programmers may wish to use the package's internal commands directly
+to access more symbols from the fonts or fine-tune their appearance.
+See \verb|\musSymbol|, \verb|\musAccidental|, and \verb|\musStack| in the code
+listing below. 
+
+\subsubsection{MusiX\TeX{} Symbol List}
+
+You may use \verb|\musSymbol| to pull in any of the following symbols by
+number:
+\musixSymbolList
 
 \section{Changes}
 
 \begin{itemize}
+    \item[2023-09-08] Improved customization, time signatures, figured bass,
+        and documentation
+        \begin{itemize}
+            \item Documentation reorganized, clarified, corrected
+            \item Customizable font commands used throughout:
+                \verb|\musAccidentalFont|, \verb|\musNumFont|,
+                \verb|\musFigSize|, and \verb|\musFigFont|
+            \item \verb|\musStack| now takes an optional last argument to
+                specify alignment
+            \item \verb|\musMeter| now takes an optional font argument, and
+                has a smaller vertical gap between numerals. It is now scaled
+                to fit within the line.
+            \item Spacing commands in \verb|\musSymbolMeter| are simplified
+            \item \verb|\meterThreeTwo| now uses \verb|\musMeter| for the
+                numbers, shifted slightly to align with the meter symbol
+            \item \verb|\meterCZ| now pulls in a cursive Z symbol from the EB
+                Garamond font (installed by default in TeXLive)
+            \item \verb|\musFig| now includes configurable \verb|\musFigSize|
+                and \verb|\musFigFont| switches, and a first optional argument
+                with alignment specifier
+            \item New commands for scale degress (\verb|\musDegree|) and
+                pitches with Helmholtz octave (\verb|\musPitch|)
+            \item For testing or extension, add command to display a list of
+                symbols by number in a given font
+        \end{itemize}
     \item[2020-01-29] Reduced stack gap for \verb|\musFig|
     \item[2019/11/24] Fix \verb|\MeterCThreeTwo| so that numbers are stacked
         and aligned correctly

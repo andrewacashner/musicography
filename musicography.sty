@@ -1,8 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{musicography}[2020/01/29
+\ProvidesPackage{musicography}[2023/09/08
   Symbols for music writing with pdflatex]
 
-% Copyright 2020 Andrew A. Cashner, andrewacashner@gmail.com
+% Copyright 2023 Andrew A. Cashner, andrewacashner@gmail.com
 
 % This work may be distributed and/or modified under the 
 % conditions of the LaTeX Project Public License, either
@@ -19,6 +19,29 @@
 % and the documentation file musicography.tex.
 
 % CHANGE LOG
+% 2023-09-08 - Improved time signatures, figured bass, documentation
+%               + Documentation reorganized, clarified, corrected
+%               + Customizable font commands used throughout:
+%                 \musAccidentalFont, \musNumFont, \musFigSize, and
+%                 \musFigFont 
+%               + \musStack now takes an optional last argument to specify
+%                 alignment
+%               + \musMeter now takes an optional font argument, and has a
+%                 smaller vertical gap between numerals. It is now scaled
+%                 to fit within the line.
+%               + Spacing commands in \musSymbolMeter are simplified
+%               + \meterThreeTwo now uses \musMeter for the numbers, shifted
+%                 slightly to align with the meter symbol
+%               + \meterCZ now pulls in a cursive Z symbol from the EB
+%                 Garamond font (installed by default in TeXLive)
+%               + \musFig now includes configurable \musFigSize and
+%                 \musFigFont switches, and a first optional argument with
+%                 alignment specifier
+%               + New commands for scale degress (\musDegree) and pitches with
+%                 Helmholtz octave (\musPitch)
+%               + For testing or extension, add command to display a list of
+%                 symbols by number in a given font
+%
 % 2020-01-29 - Reduced stack gap for \musFig
 % 2019-11-24 - Fix problem with \MeterCThreeTwo where numerals were being
 %               printed next to each other instead of stacked.
@@ -75,10 +98,13 @@
 
 % ACCIDENTALS
 
+% Larger relative font for accidentals (can be modified)
+\NewDocumentCommand{\musAccidentalFont}{}{\musFontLarge}
+
 % Any accidental
 %  #1 symbol command for accidental
 \NewDocumentCommand{\musAccidental}{ m }{%
-    \musSymbol[\musFontLarge]{0.1em}{0.5ex}{-0.1pt}{#1}%
+    \musSymbol[\musAccidentalFont]{0.1em}{0.5ex}{-0.1pt}{#1}%
 }
 
 % Specific accidentals
@@ -199,25 +225,35 @@
 
 \RequirePackage{stackengine}
 
-% Specify the font for numbers in \musStack
-%
-% This is empty by default, but you could redefine it, for example, to use
-% lining figures, math mode, sans-serif, etc.
+% Only a minimal vertical gap between stacked elements
+\setstackgap{S}{1pt}
+
+% Specify the font for numbers in \musStack. For time signatures I think bold
+% numbers look better in most fonts, but you could redefine it, for example,
+% to use lining figures, math mode, sans-serif, etc.
 %
 % Example: To get lining figures when using the ebgaramond package:
-% \renewcommand{\musNumFont}[1]{\liningnums{#1}}
-\NewDocumentCommand{\musNumFont}{}{}
+% \renewcommand{\musNumFont}{\liningnums}
+%
+% The command is employed in a way that both font switches and commands with
+% arguments will work (e.g., {\bfseries\liningnums}), but take care when
+% combining multiple elements.
+\NewDocumentCommand{\musNumFont}{}{\bfseries}
 
 % Command to stack numerals for metrical symbols or figured bass
 % Takes any number of space-separated arguments and stacks them vertically
 % 
 % #1 (optional) Font command (\musNumFont by default)
 % #2 Series of space-separated arguments to be stacked, e.g., {\fl6 5}
-\NewDocumentCommand{\musStack}{ O{\musNumFont} m }{%
-    {#1\Shortstack[l]{#2}}%
+% #3 (optional) Alignment specifier for \Shortstack (l, c, or r); default is c
+%    for centering
+\NewDocumentCommand{\musStack}{ O{\musNumFont} m O{c} }{%
+    {#1{\Shortstack[#3]{#2}}}%
 }
 
 % METER and TIME SIGNATURES
+
+\RequirePackage{graphicx} % for resizebox
 
 % Numeric meter signatures (e.g., 3/4)
 %  #1 (optional) font command (\musNumFont by default)
@@ -226,16 +262,18 @@
 %
 % In a pinch you can issue a font command directly in the optional first
 % argument, but it would be better to redefine \musNumFont.
+%
+% These are now scaled to the current line height and centered.
 \NewDocumentCommand{\musMeter}{ O{\musNumFont} m m }{%
-    \musStack[#1]{#2 #3}\kern0.05em
+    \resizebox{!}{\ht\strutbox}{%
+        \musStack[#1]{#2 #3}%
+    }\kern0.05em
 }
 
 % Meter symbols
 %  #1 symbol code for meter sign
 \NewDocumentCommand{\musSymbolMeter}{ m }{%
-    \raisebox{0.58ex}[8pt][2pt]{%
-        {\kern-1pt\musFontBig\raisebox{0.3ex}{#1}\kern0.3em}%
-    }%
+    \smash{\kern-1pt\musFontBig\raisebox{1.1ex}{#1}\kern0.3em}%
 }
 
 % Meter symbol plus numerals
@@ -255,9 +293,10 @@
 \NewDocumentCommand{\meterThree}{}{%
     {\musNumFont{3}}%
 }
+
 % 3/2
 \NewDocumentCommand{\meterThreeTwo}{}{%
-    {{\footnotesize\stackanchor[1pt]{3}{2}}}%
+    \raisebox{-0.26ex}{\musMeter{3}{2}}%
 }
 
 % Combining symbols and numbers
@@ -283,9 +322,23 @@
     \meterCplus{\meterThreeTwo}%
 }
 
-% Ternary meter used in 17th-century Spanish music
+% CZ meter: Ternary meter used in 17th-century Spanish music
+%
+% A cursive Z to match the C meter symbol, as notated in Spanish manuscripts
+%
+% Pull in symbol from EB Garamond font; could be redefined
+\NewDocumentCommand{\meterZfont}{}{%
+    \fontfamily{EBGaramond-LF}\selectfont
+}
+
+% The symbol
+\NewDocumentCommand{\meterZsymbol}{}{%
+    {\meterZfont\Large\itshape z}%
+}
+
+% CZ meter
 \NewDocumentCommand{\meterCZ}{}{%
-    \meterCplus{Z}%
+    \meterCplus{\meterZsymbol}%
 }
 
 % Perfect meter in medieval music
@@ -295,15 +348,35 @@
 
 
 % FIGURED BASS
-% Same command used for figured bass
-\NewDocumentCommand{\musFigFont}{}{%
+
+% Definable font command to be used with figured bass; consider matching
+% \musNumFont (e.g., with lining numerals)
+\NewDocumentCommand{\musFigFont}{}{}
+
+% Size adjustment for figured bass: smaller font for numerals, reduce sizes of
+% music symbols (\tiny might make it fit better within the line height)
+\NewDocumentCommand{\musFigSize}{}{%
     \scriptsize
-    \let\musFontLarge\musFontBig
+    \RenewDocumentCommand{\musAccidentalFont}{}{\musFont}%
 }
-\NewDocumentCommand{\musFig}{ m }{%
-    \setstackgap{S}{1pt}%
-    \musStack[\musFigFont]{#1}%
+
+% Figured bass is typeset a \musStack using \musFigFont, right-aligned to
+% allow for accidentals preceding numerals
+%  #1 (optional) Alignment specifier: l, c, r (default: r)
+%  #2 space-delimited list of arguments to stack, in top-down order
+% 
+% Example: \musFig{\fl6 4} or \musFig{\sh5 4 2}
+%
+% Note that the command applies first \musFigSize, then \musFigFont inside the
+% stack.
+\NewDocumentCommand{\musFig}{ O{r} m }{%
+    {\musFigSize\musStack[\musFigFont]{#2}[#1]}%
 }
+
+% Placeholder for no figure, to maintain alignment
+%  #1 (optional) width of blank space (Default: numeral 5)
+%
+% Example: \musFig{6 4}--\musFig{5 \noFig}
 \NewDocumentCommand{\noFig}{ O{5} }{%
     \hphantom{#1}%
 }
@@ -326,5 +399,47 @@
 
 % Recommended: Use my 'octave' package for more options, including
 % traditional, non-Helmholtz notation
+
+% AUXILIARY COMMANDS
+
+% Print a list of symbols for documentation, debugging, or extension
+% E.g., \symbolList{\musFont}{256} to see all useable symbols in MusiXTeX font
+
+\RequirePackage{setspace} % for symbol list spacing
+
+\ExplSyntaxOn
+% Single entry in the symbol list: Number + corresponding symbol
+%  #1 font command
+%  #2 symbol number
+\cs_new:Nn \aac_symbolEntry:nn
+{
+    \makebox[4em]{#2\quad{#1\symbol{#2}}}\ %
+}
+
+% Loop through all the symbols in given font up to given max
+%  #1 font command
+%  #2 max symbol number
+\cs_new:Nn \aac_symbolLoop:nn
+{
+    \int_step_inline:nnn {0} {#2 - 1}
+    {
+        \aac_symbolEntry:nn {#1} {##1}
+    }
+}
+
+
+% The whole symbol list up to a given max, typeset in a big double-spaced
+% block
+%  #1 font command
+%  #2 max symbol number
+\NewDocumentCommand{\symbolList}{ m m }{\par
+    \begin{doublespace}
+        \noindent\aac_symbolLoop:nn {#1} {#2}
+    \end{doublespace}
+}
+\ExplSyntaxOff
+
+% Print a list of symbols in the MusiXTeX font
+\NewDocumentCommand{\musixSymbolList}{}{\symbolList{\musFont}{128}}
 
 \endinput
